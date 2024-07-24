@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'expense.dart';
 import 'database_helper.dart';
+import 'home_screen.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   @override
@@ -27,7 +28,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         description: _descriptionController.text, // Added description
       );
       await DatabaseHelper().insertExpense(expense);
-      Navigator.pop(context);
+      Navigator.pushReplacement(context,  MaterialPageRoute(builder: (context) => HomeScreen()),); // Return a result indicating an update
+
     }
   }
 

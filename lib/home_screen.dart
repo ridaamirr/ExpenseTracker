@@ -10,7 +10,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final DatabaseHelper dbHelper = DatabaseHelper();
   double _balance = 0.0;
-  bool _isBalanceVisible = true;
+  bool _isBalanceVisible = false;
 
   @override
   void initState() {

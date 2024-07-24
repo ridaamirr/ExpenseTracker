@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'add_expense_screen.dart';
 import 'expense_list_screen.dart';
-import 'budget_screen.dart';
 
 void main() {
   runApp(ExpenseTrackerApp());
@@ -33,7 +32,6 @@ class _MainScreenState extends State<MainScreen> {
     HomeScreen(),
     AddExpenseScreen(),
     ExpenseListScreen(),
-    BudgetScreen(),
   ];
 
   void _onTabTapped(int index) {
@@ -63,10 +61,6 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
             label: 'Expenses',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: 'Budget',
           ),
         ],
       ),
