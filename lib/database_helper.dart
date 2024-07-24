@@ -22,10 +22,23 @@ class DatabaseHelper {
       path,
       onCreate: (db, version) {
         return db.execute(
-          "CREATE TABLE expenses(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, amount REAL, date TEXT, category TEXT)",
+          "CREATE TABLE expenses("
+              "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+              "title TEXT, "
+              "amount REAL, "
+              "date TEXT, "
+              "category TEXT, "
+              "description TEXT)",
         );
       },
-      version: 1,
+      onUpgrade: (db, oldVersion, newVersion) {
+        if (oldVersion < newVersion) {
+          db.execute(
+            "ALTER TABLE expenses ADD COLUMN description TEXT",
+          );
+        }
+      },
+      version: 6, // Incremented version
     );
   }
 
@@ -44,11 +57,13 @@ class DatabaseHelper {
         amount: maps[i]['amount'],
         date: DateTime.parse(maps[i]['date']),
         category: maps[i]['category'],
+        description: maps[i]['description'], // Added description
       );
     });
   }
 
   Future<void> updateExpense(Expense expense) async {
+    print(expense.category);
     final db = await database;
     await db!.update(
       'expenses',

@@ -1,40 +1,55 @@
 import 'package:flutter/material.dart';
 import 'expense.dart';
 import 'database_helper.dart';
+import 'expense_list_screen.dart';
 
-class AddExpenseScreen extends StatefulWidget {
+class EditExpenseScreen extends StatefulWidget {
+  final Expense expense;
+
+  EditExpenseScreen({required this.expense});
+
   @override
-  _AddExpenseScreenState createState() => _AddExpenseScreenState();
+  _EditExpenseScreenState createState() => _EditExpenseScreenState();
 }
 
-class _AddExpenseScreenState extends State<AddExpenseScreen> {
+class _EditExpenseScreenState extends State<EditExpenseScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _amountController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  late TextEditingController _titleController;
+  late TextEditingController _amountController;
+  late TextEditingController _descriptionController;
 
-  String _selectedCategory = 'Outflow'; // Default value for dropdown
+  late String _selectedCategory;
+  late DateTime _selectedDate;
 
-  DateTime _selectedDate = DateTime.now();
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.expense.title);
+    _amountController = TextEditingController(text: widget.expense.amount.toString());
+    _descriptionController = TextEditingController(text: widget.expense.description);
+    _selectedCategory = widget.expense.category;
+    _selectedDate = widget.expense.date;
+  }
 
-  Future<void> _saveExpense() async {
+  Future<void> _updateExpense() async {
     if (_formKey.currentState!.validate()) {
-      final expense = Expense(
+      final updatedExpense = Expense(
+        id: widget.expense.id,
         title: _titleController.text,
         amount: double.parse(_amountController.text),
         date: _selectedDate,
         category: _selectedCategory,
-        description: _descriptionController.text, // Added description
+        description: _descriptionController.text,
       );
-      await DatabaseHelper().insertExpense(expense);
-      Navigator.pop(context);
+      await DatabaseHelper().updateExpense(updatedExpense);
+      Navigator.pushReplacement(context,  MaterialPageRoute(builder: (context) => ExpenseListScreen()),); // Return a result indicating an update
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add Expense')),
+      appBar: AppBar(title: Text('Edit Expense')),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Form(
@@ -96,8 +111,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _saveExpense,
-                child: Text('Save Expense'),
+                onPressed: _updateExpense,
+                child: Text('Update Expense'),
               ),
             ],
           ),

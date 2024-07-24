@@ -1,48 +1,93 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 import 'expense.dart';
-import 'add_expense_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final DatabaseHelper dbHelper = DatabaseHelper();
+  double _balance = 0.0;
+  bool _isBalanceVisible = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _calculateBalance();
+  }
+
+  Future<void> _calculateBalance() async {
+    final expenses = await dbHelper.getExpenses();
+    double inflows = 0.0;
+    double outflows = 0.0;
+
+    for (var expense in expenses) {
+      if (expense.category == 'Inflow') {
+        inflows += expense.amount;
+      } else if (expense.category == 'Outflow') {
+        outflows += expense.amount;
+      }
+    }
+
+    setState(() {
+      _balance = inflows - outflows;
+    });
+  }
+
+  void _toggleBalanceVisibility() {
+    setState(() {
+      _isBalanceVisible = !_isBalanceVisible;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Expense Tracker')),
-      body: FutureBuilder<List<Expense>>(
-        future: dbHelper.getExpenses(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No expenses added yet.'));
-          } else {
-            final expenses = snapshot.data!;
-            return ListView.builder(
-              itemCount: expenses.length,
-              itemBuilder: (context, index) {
-                final expense = expenses[index];
-                return ListTile(
-                  title: Text(expense.title),
-                  subtitle: Text('${expense.amount} - ${expense.category}'),
-                  trailing: Text('${expense.date.toLocal()}'),
-                );
-              },
-            );
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddExpenseScreen()),
-          );
-        },
-        child: Icon(Icons.add),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            children: [
+              SizedBox(height: 100),
+              Container(
+                padding: EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.blue[900], // Dark blue color
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Balance: ',
+                      style: Theme.of(context).textTheme.headline5!.copyWith(
+                        color: Colors.white, // White text color
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      _isBalanceVisible ? 'Rs. ${_balance.toStringAsFixed(2)}' : '*****',
+                      style: Theme.of(context).textTheme.headline4!.copyWith(
+                        color: Colors.white, // White text color
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    IconButton(
+                      icon: Icon(
+                        _isBalanceVisible ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.white,
+                      ),
+                      onPressed: _toggleBalanceVisibility,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
