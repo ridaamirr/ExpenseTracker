@@ -23,7 +23,7 @@ Develop an app to help users track their expenses and manage their budget.
 
 ## Getting Started
 
-1. Clone the repository: `git clone [insert repository URL]`
+1. Clone the repository: `git clone https://github.com/ridaamirr/ExpenseTracker`
 2. Install dependencies: `npm install` or `gradle build`
 3. Run the app: `npm start` or `gradle run`
 
